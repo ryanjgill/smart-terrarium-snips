@@ -1,7 +1,7 @@
 module.exports = (measurementType) => {
   switch (measurementType) {
     case 'temperature':
-      return 'degres celsius'
+      return 'degrees celsius'
     case 'humidity':
     case 'soilMoisture':
     case 'drainWaterLevel':
