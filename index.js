@@ -30,7 +30,7 @@ const getMeasurementByType = (message) => {
     .then(measurement => {
       let units = getUnits(measurementType)
       console.log(`The ${getMeasurementDisplay(measurementType)} is ${measurement[measurementType]} ${units}.`)
-      picoSpeaker.speak(`The current ${measurementType} is ${measurement.measurementType}`)
+      picoSpeaker.speak(`The ${getMeasurementDisplay(measurementType)} is ${measurement[measurementType]} ${units}.`)
     })
     .catch(error => console.log(error))
 }
