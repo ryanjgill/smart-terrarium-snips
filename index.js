@@ -10,6 +10,38 @@ const HOST = config.host
 const client  = mqtt.connect('mqtt://' + HOST, { port: 1883 })
 const request = require('request-promise-native')
 const appIp = config.appIp
+const matrix = require("@matrix-io/matrix-lite")
+let chase = null
+const allLedsOff = new Array(matrix.led.length).fill({})
+
+// LEDs off
+matrix.led.set()
+
+// Arrays can simulate motion
+everloop = allLedsOff
+everloop[0] = {b:255, w: 100}
+
+const stop = function () {
+	clearInterval(chase)
+	chase = null
+}
+
+const start = function () {
+	chase = setInterval(function(){
+	  var lastColor = everloop.shift()
+	  everloop.push(lastColor)
+	  matrix.led.set(everloop)
+	},1000/30)
+}
+
+const setColor = (color) => {
+  // color examples: 
+  // "rgb(0,0,255)"
+  // {r:0, g:0, b:255, w:0}
+  // #0000ff"
+  // "blue"
+  matrix.led.set(color); 
+}
 
 const getMeasurementByType = (client, message) => {
   let slot = _get(message, 'slots', [])[0]
@@ -52,18 +84,27 @@ client.on('message', function (topic, message) {
     switch (topic) {
       case 'hermes/hotword/default/detected':
         console.log(chalk.green("Hotword detected!"))
+        start()
         break
       case 'hermes/intent/ryanjgill:ToggleLights':
+        stop()
+        setColor('#FF6F00')
         toggleLights(client, JSON.parse(message))
         break
       case 'hermes/intent/ryanjgill:ToggleMister':
+        stop()
+        setColor('#01579B');
         toggleMister(client, JSON.parse(message))
         break
       case 'hermes/intent/ryanjgill:GetMeasurementByType':
+        stop()
+        setColor('#311B92')
         getMeasurementByType(client, JSON.parse(message))
         break
       case 'hermes/dialogueManager/sessionEnded':
         console.log(chalk.yellow('waiting for wake word ...'))
+        stop()
+        setColor()
       default:
         break
     }  
